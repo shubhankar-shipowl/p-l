@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
+
 async function getConnectionWithRetry(maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
