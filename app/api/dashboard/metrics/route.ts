@@ -55,21 +55,21 @@ export async function GET(request: NextRequest) {
       // Column check
       let filterColumn = 'pickup_warehouse';
       try {
-        // Check if pickup_warehouse exists first (Priority)
-        const [pwColumns] = await connection.query(`
+        // Check if order_account exists (Priority to match frontend dropdown which uses emails)
+        const [oaColumns] = await connection.query(`
           SELECT COLUMN_NAME FROM information_schema.COLUMNS 
-          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'pickup_warehouse'
+          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'order_account'
         `) as any[];
         
-        if (pwColumns.length > 0) {
-           filterColumn = 'pickup_warehouse';
+        if (oaColumns.length > 0) {
+           filterColumn = 'order_account';
         } else {
-             // Fallback to order_account
-            const [columns] = await connection.query(`
+             // Fallback to pickup_warehouse
+            const [pwColumns] = await connection.query(`
               SELECT COLUMN_NAME FROM information_schema.COLUMNS 
-              WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'order_account'
+              WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'pickup_warehouse'
             `) as any[];
-            if (columns.length > 0) filterColumn = 'order_account';
+            if (pwColumns.length > 0) filterColumn = 'pickup_warehouse';
         }
       } catch (e) { /* ignore */ }
 
