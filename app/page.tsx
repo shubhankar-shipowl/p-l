@@ -142,14 +142,15 @@ export default function Dashboard() {
         selectedStores.length > 0
           ? selectedStores.map(s => `stores[]=${encodeURIComponent(s)}`).join('&')
           : "";
+      const timestamp = new Date().getTime();
       const url = showAllData
-        ? `/api/dashboard/metrics${storesParam ? `?${storesParam}` : ""}`
-        : `/api/dashboard/metrics?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}${storesParam ? `&${storesParam}` : ""}`;
+        ? `/api/dashboard/metrics?t=${timestamp}${storesParam ? `&${storesParam}` : ""}`
+        : `/api/dashboard/metrics?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}&t=${timestamp}${storesParam ? `&${storesParam}` : ""}`;
       
       console.log('Fetching metrics with URL:', url);
       console.log('Selected stores:', selectedStores);
       
-      const response = await fetch(url);
+      const response = await fetch(url, { cache: 'no-store' });
       if (!response.ok) {
         throw new Error("Failed to fetch metrics");
       }

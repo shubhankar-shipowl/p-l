@@ -91,15 +91,15 @@ export async function GET(request: NextRequest) {
             COALESCE(SUM(pe.price_after_gst), 0) as cost,
             COUNT(*) as count
           FROM orders o
-          JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
-          JOIN price_entries pe ON pe.supplier_id = su.id 
+          LEFT JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
+          LEFT JOIN price_entries pe ON pe.supplier_id = su.id 
             AND TRIM(pe.product_name) = TRIM(o.product_name)
-          WHERE o.order_date >= ? AND o.order_date <= ?
-            AND LOWER(o.status) NOT LIKE '%cancel%'
             AND (
               o.order_date BETWEEN pe.effective_from AND pe.effective_to
               OR (pe.effective_to IS NULL AND o.order_date >= pe.effective_from)
             )
+          WHERE o.order_date >= ? AND o.order_date <= ?
+            AND LOWER(o.status) NOT LIKE '%cancel%'
             ${pickupFilterClause}
         `;
         const [rows] = await connection.query(query, [s, e, ...params]) as any[];
@@ -187,15 +187,15 @@ export async function GET(request: NextRequest) {
           COALESCE(SUM(o.order_amount), 0) as revenue,
           COALESCE(SUM(pe.price_after_gst), 0) as product_cost
         FROM orders o
-        JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
-        JOIN price_entries pe ON pe.supplier_id = su.id 
+        LEFT JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
+        LEFT JOIN price_entries pe ON pe.supplier_id = su.id 
           AND TRIM(pe.product_name) = TRIM(o.product_name)
-        WHERE o.order_date >= ? AND o.order_date <= ?
-          AND LOWER(o.status) NOT LIKE '%cancel%'
           AND (
             o.order_date BETWEEN pe.effective_from AND pe.effective_to
             OR (pe.effective_to IS NULL AND o.order_date >= pe.effective_from)
           )
+        WHERE o.order_date >= ? AND o.order_date <= ?
+          AND LOWER(o.status) NOT LIKE '%cancel%'
           ${pickupFilterClause}
         GROUP BY DATE(o.order_date)
         ORDER BY date
@@ -254,15 +254,15 @@ export async function GET(request: NextRequest) {
           COUNT(*) as order_count,
           COALESCE(SUM(o.order_amount), 0) as total_revenue
         FROM orders o
-        JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
-        JOIN price_entries pe ON pe.supplier_id = su.id 
+        LEFT JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
+        LEFT JOIN price_entries pe ON pe.supplier_id = su.id 
           AND TRIM(pe.product_name) = TRIM(o.product_name)
-        WHERE o.order_date >= ? AND o.order_date <= ?
-          AND LOWER(o.status) NOT LIKE '%cancel%'
           AND (
             o.order_date BETWEEN pe.effective_from AND pe.effective_to
             OR (pe.effective_to IS NULL AND o.order_date >= pe.effective_from)
           )
+        WHERE o.order_date >= ? AND o.order_date <= ?
+          AND LOWER(o.status) NOT LIKE '%cancel%'
           ${pickupFilterClause}
         GROUP BY o.channel
       `;
@@ -297,15 +297,15 @@ export async function GET(request: NextRequest) {
           COUNT(o.id) as order_count,
           COALESCE(SUM(o.order_amount), 0) as total_revenue
         FROM orders o
-        JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
-        JOIN price_entries pe ON pe.supplier_id = su.id 
+        LEFT JOIN suppliers su ON TRIM(o.${filterColumn}) = TRIM(su.name)
+        LEFT JOIN price_entries pe ON pe.supplier_id = su.id 
           AND TRIM(pe.product_name) = TRIM(o.product_name)
-        WHERE o.order_date >= ? AND o.order_date <= ?
-          AND LOWER(o.status) NOT LIKE '%cancel%'
           AND (
             o.order_date BETWEEN pe.effective_from AND pe.effective_to
             OR (pe.effective_to IS NULL AND o.order_date >= pe.effective_from)
           )
+        WHERE o.order_date >= ? AND o.order_date <= ?
+          AND LOWER(o.status) NOT LIKE '%cancel%'
           ${pickupFilterClause}
         GROUP BY pe.product_name
         ORDER BY total_revenue DESC
